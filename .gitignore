@@ -1,0 +1,14 @@
+# Ignore environments and secrets
+.env
+.model.toml
+*.db
+*.pyc
+__pycache__/
+
+# Ignore heavy Anvil generation data
+anvil-cli/my-dataset/
+anvil-cli/anvil-venv/
+
+# Ignore system logs
+*.log
+.DS_Store

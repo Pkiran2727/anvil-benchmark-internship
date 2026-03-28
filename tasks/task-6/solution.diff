@@ -1,0 +1,19 @@
+diff --git a/app.py b/app.py
+index ba8ff48..7e2283e 100644
+--- a/app.py
++++ b/app.py
+@@ -93,6 +93,14 @@ def create_app(config: dict = None) -> Flask:
+         db.session.commit()
+         return jsonify(item.to_dict()), 201
+ 
++    """Solution for Task 6: adds POST /api/auth/refresh endpoint."""
++    
++    @app.route("/api/auth/refresh", methods=["POST"])
++    @require_auth
++    def refresh_token():
++        new_token = create_token(g.user_id, app.config["SECRET_KEY"])
++        return jsonify({"token": new_token}), 200
++
+     return app
+ 
+ 

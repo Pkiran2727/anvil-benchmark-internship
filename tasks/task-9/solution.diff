@@ -1,0 +1,42 @@
+diff --git a/app.py b/app.py
+index ba8ff48..aa2dd74 100644
+--- a/app.py
++++ b/app.py
+@@ -5,7 +5,7 @@ Tasks 1-10 add new endpoints to this file.
+ """
+ import os
+ from flask import Flask, request, jsonify, g
+-from models import db, User, Item
++from models import db, User, Item, AuditLog
+ from auth import create_token, require_auth
+ 
+ 
+@@ -49,6 +49,8 @@ def create_app(config: dict = None) -> Flask:
+         user.set_password(password)
+         db.session.add(user)
+         db.session.commit()
++        db.session.add(AuditLog(action="register", resource="user", user_id=None))
++        db.session.commit()
+ 
+         return jsonify({"message": "User created successfully", "id": user.id}), 201
+ 
+@@ -91,8 +93,19 @@ def create_app(config: dict = None) -> Flask:
+         )
+         db.session.add(item)
+         db.session.commit()
++        db.session.add(AuditLog(action="create_item", resource="item", user_id=g.user_id))
++        db.session.commit()
+         return jsonify(item.to_dict()), 201
+ 
++    """Solution for Task 9: adds GET /api/audit endpoint."""
++    
++    @app.route("/api/audit", methods=["GET"])
++    @require_auth
++    def get_audit_log():
++        from models import AuditLog
++        logs = AuditLog.query.order_by(AuditLog.id.desc()).all()
++        return jsonify([l.to_dict() for l in logs]), 200
++
+     return app
+ 
+ 

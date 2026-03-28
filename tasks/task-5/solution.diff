@@ -1,0 +1,23 @@
+diff --git a/app.py b/app.py
+index ba8ff48..30e6782 100644
+--- a/app.py
++++ b/app.py
+@@ -4,6 +4,8 @@ BASE STATE: Only register, login, get_items, create_item are implemented.
+ Tasks 1-10 add new endpoints to this file.
+ """
+ import os
++import re
++EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
+ from flask import Flask, request, jsonify, g
+ from models import db, User, Item
+ from auth import create_token, require_auth
+@@ -39,6 +41,9 @@ def create_app(config: dict = None) -> Flask:
+         if not username or not email or not password:
+             return jsonify({"error": "username, email and password are required"}), 400
+ 
++        if not EMAIL_RE.match(email):
++            return jsonify({"error": "Invalid email format"}), 400
++
+         if User.query.filter_by(username=username).first():
+             return jsonify({"error": "Username already taken"}), 409
+ 

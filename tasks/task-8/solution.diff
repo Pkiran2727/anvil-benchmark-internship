@@ -1,0 +1,39 @@
+diff --git a/app.py b/app.py
+index ba8ff48..d142c2f 100644
+--- a/app.py
++++ b/app.py
+@@ -4,6 +4,8 @@ BASE STATE: Only register, login, get_items, create_item are implemented.
+ Tasks 1-10 add new endpoints to this file.
+ """
+ import os
++from collections import defaultdict
++from datetime import datetime, timedelta
+ from flask import Flask, request, jsonify, g
+ from models import db, User, Item
+ from auth import create_token, require_auth
+@@ -23,6 +25,16 @@ def create_app(config: dict = None) -> Flask:
+         app.config.update(config)
+ 
+     db.init_app(app)
++    app.rate_store = defaultdict(list)
++    def _check_rate_limit(ip, max_req=5, window=60):
++        now = datetime.utcnow()
++        cutoff = now - timedelta(seconds=window)
++        app.rate_store[ip] = [t for t in app.rate_store[ip] if t > cutoff]
++        if len(app.rate_store[ip]) >= max_req:
++            return False
++        app.rate_store[ip].append(now)
++        return True
++
+ 
+     with app.app_context():
+         db.create_all()
+@@ -54,6 +66,8 @@ def create_app(config: dict = None) -> Flask:
+ 
+     @app.route("/api/auth/login", methods=["POST"])
+     def login():
++        if not _check_rate_limit(request.remote_addr):
++            return jsonify({"error": "Rate limit exceeded. Try again later."}), 429
+         data = request.get_json() or {}
+         username = data.get("username", "")
+         password = data.get("password", "")
