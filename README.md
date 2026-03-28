@@ -8,6 +8,8 @@ This repository contains a fully automated benchmark for evaluating AI Software 
 - **Verification**: 100% solvable by an Oracle agent (verified via Anvil CLI).
 - **Calibration**: Gemini 2.0 Flash achieves ~36.4% success rate, indicating a meaningful difficulty curve.
 
+**GitHub Repository**: [https://github.com/Pkiran2727/anvil-benchmark-internship](https://github.com/Pkiran2727/anvil-benchmark-internship)
+
 ## 📂 Repository Structure
 - `flask-task-api/`: The base source code repository (The "Subject").
 - `tasks/`: 11 task definitions including problem statements, behavioral tests, and golden patches.
